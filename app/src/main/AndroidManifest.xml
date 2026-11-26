@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   Security: this app deliberately has NO internet permission in v1. All data stays on the
-  phone. CI fails if any library adds android.permission.INTERNET to the merged manifest.
+  phone. Any library that requests it is stripped below, and CI fails if it still reaches the merged manifest.
   Backups are off so notes are never copied off the device unencrypted.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- A library adds this permission; Smaran never uses the network, so strip it. -->
+    <uses-permission
+        android:name="android.permission.INTERNET"
+        tools:node="remove" />
 
     <application
         android:name=".SmaranApplication"

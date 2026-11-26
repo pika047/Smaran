@@ -37,6 +37,8 @@ jobs:
 
       - name: Check the app requests no internet permission
         run: |
+          echo "Libraries that asked for INTERNET (stripped by app manifest):"
+          grep -h -B1 -A3 'android.permission.INTERNET' app/build/outputs/logs/manifest-merger-release-report.txt || true
           manifests=$(find app/build/intermediates -path '*release*' -name AndroidManifest.xml)
           echo "$manifests"
           test -n "$manifests"
