@@ -43,10 +43,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
+import android.content.pm.PackageManager
+import com.smaran.core.domain.speech.SpeechError
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smaran.core.ui.component.BigButton
+import com.smaran.core.ui.component.SmaranIcons
 import com.smaran.core.ui.theme.Dimens
 import java.time.Instant
 import java.time.LocalDate
@@ -78,9 +82,43 @@ internal fun AddNoteRoute(
         viewModel.onDayChosen(date)
     }
 
+    // Microphone permission is asked the first time Speak or Say when is tapped.
+    val context = LocalContext.current
+    var pendingListen by rememberSaveable { mutableStateOf<ListeningFor?>(null) }
+    val startListening: (ListeningFor) -> Unit = { target ->
+        when (target) {
+            ListeningFor.Note -> viewModel.startListeningForNote()
+            ListeningFor.When -> viewModel.startListeningForWhen()
+        }
+    }
+    val microphonePermission = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { granted ->
+        val target = pendingListen
+        pendingListen = null
+        when {
+            !granted -> viewModel.onMicrophoneDenied()
+            target != null -> startListening(target)
+        }
+    }
+    val onSpeak: (ListeningFor) -> Unit = { target ->
+        if (state.listeningFor != null) {
+            viewModel.stopListening()
+        } else if (
+            ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) ==
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            startListening(target)
+        } else {
+            pendingListen = target
+            microphonePermission.launch(Manifest.permission.RECORD_AUDIO)
+        }
+    }
+
     AddNoteScreen(
         state = state,
         today = viewModel.today,
+        onSpeak = onSpeak,
         onTextChange = viewModel::onTextChange,
         onTextDone = viewModel::onTextDone,
         onNoReminder = viewModel::onNoReminder,
@@ -95,6 +133,7 @@ internal fun AddNoteRoute(
 internal fun AddNoteScreen(
     state: AddNoteUiState,
     today: LocalDate,
+    onSpeak: (ListeningFor) -> Unit,
     onTextChange: (String) -> Unit,
     onTextDone: () -> Unit,
     onNoReminder: () -> Unit,
@@ -114,8 +153,8 @@ internal fun AddNoteScreen(
             verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
         ) {
             when (state.step) {
-                AddNoteStep.Write -> WriteStep(state, onTextChange, onTextDone, onCancel)
-                AddNoteStep.ChooseDay -> ChooseDayStep(state, today, onNoReminder, onDayChosen, onBack)
+                AddNoteStep.Write -> WriteStep(state, onSpeak, onTextChange, onTextDone, onCancel)
+                AddNoteStep.ChooseDay -> ChooseDayStep(state, today, onSpeak, onNoReminder, onDayChosen, onBack)
                 AddNoteStep.ChooseTime -> ChooseTimeStep(state, onTimeChosen, onBack)
             }
         }
@@ -125,6 +164,7 @@ internal fun AddNoteScreen(
 @Composable
 private fun ColumnScope.WriteStep(
     state: AddNoteUiState,
+    onSpeak: (ListeningFor) -> Unit,
     onTextChange: (String) -> Unit,
     onTextDone: () -> Unit,
     onCancel: () -> Unit,
@@ -140,6 +180,18 @@ private fun ColumnScope.WriteStep(
         supportingText = state.error?.let { error -> { Text(error.message()) } },
         modifier = Modifier.fillMaxWidth(),
     )
+    if (state.speechAvailable) {
+        SpeakButton(
+            label = stringResource(R.string.speak),
+            isListening = state.listeningFor == ListeningFor.Note,
+            onClick = { onSpeak(ListeningFor.Note) },
+        )
+        Text(
+            stringResource(R.string.speech_privacy_note),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
     BigButton(
         text = stringResource(R.string.add_note_next),
         onClick = onTextDone,
@@ -158,6 +210,7 @@ private fun ColumnScope.WriteStep(
 private fun ColumnScope.ChooseDayStep(
     state: AddNoteUiState,
     today: LocalDate,
+    onSpeak: (ListeningFor) -> Unit,
     onNoReminder: () -> Unit,
     onDayChosen: (LocalDate) -> Unit,
     onBack: () -> Unit,
@@ -166,7 +219,15 @@ private fun ColumnScope.ChooseDayStep(
 
     Text(stringResource(R.string.add_note_when_title), style = MaterialTheme.typography.headlineMedium)
     Text(state.text.trim(), style = MaterialTheme.typography.bodyLarge)
+    state.error?.let { Text(it.message(), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyLarge) }
 
+    if (state.speechAvailable) {
+        SpeakButton(
+            label = stringResource(R.string.say_when),
+            isListening = state.listeningFor == ListeningFor.When,
+            onClick = { onSpeak(ListeningFor.When) },
+        )
+    }
     BigButton(stringResource(R.string.add_note_today), { onDayChosen(today) }, icon = Icons.Filled.Notifications)
     BigButton(stringResource(R.string.add_note_tomorrow), { onDayChosen(today.plusDays(1)) }, icon = Icons.Filled.Notifications)
     BigButton(stringResource(R.string.add_note_pick_date), { showDatePicker = true }, icon = Icons.Filled.DateRange)
@@ -225,6 +286,14 @@ private fun ColumnScope.ChooseTimeStep(
     Text(stringResource(R.string.add_note_time_title, dateText), style = MaterialTheme.typography.headlineMedium)
     state.error?.let { Text(it.message(), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyLarge) }
 
+    state.suggestedTime?.let { suggested ->
+        BigButton(
+            stringResource(R.string.add_note_suggested_time, suggested.format(timeFormat)),
+            { onTimeChosen(suggested) },
+            icon = SmaranIcons.Mic,
+            enabled = !state.isSaving,
+        )
+    }
     BigButton(
         stringResource(R.string.add_note_morning, AddNoteViewModel.MORNING.format(timeFormat)),
         { onTimeChosen(AddNoteViewModel.MORNING) },
@@ -270,4 +339,26 @@ private fun AddNoteError.message(): String = when (this) {
     AddNoteError.Empty -> stringResource(R.string.add_note_error_empty)
     is AddNoteError.TooLong -> stringResource(R.string.add_note_error_too_long, maxLength)
     AddNoteError.ReminderInPast -> stringResource(R.string.add_note_error_past)
+    AddNoteError.WhenNotUnderstood -> stringResource(R.string.when_not_understood)
+    is AddNoteError.Speech -> stringResource(
+        when (reason) {
+            SpeechError.NothingHeard -> R.string.speech_error_nothing_heard
+            SpeechError.NoPermission -> R.string.speech_error_no_permission
+            SpeechError.NotAvailable -> R.string.speech_error_not_available
+            SpeechError.NeedsInternet -> R.string.speech_error_needs_internet
+            SpeechError.Busy -> R.string.speech_error_busy
+            SpeechError.Other -> R.string.speech_error_other
+        },
+    )
+}
+
+/** Large microphone button. While listening it says so, and a second tap stops. */
+@Composable
+private fun SpeakButton(label: String, isListening: Boolean, onClick: () -> Unit) {
+    BigButton(
+        text = if (isListening) stringResource(R.string.listening_tap_to_stop) else label,
+        onClick = onClick,
+        icon = SmaranIcons.Mic,
+        primary = !isListening,
+    )
 }
