@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="add_note_title">New note</string>
+    <string name="add_note_field_label">What do you want to remember?</string>
+    <string name="add_note_save">Save</string>
+    <string name="add_note_cancel">Cancel</string>
+    <string name="add_note_error_empty">Please write something first.</string>
+    <string name="add_note_error_too_long">This note is too long. Please keep it under %1$d letters.</string>
+</resources>

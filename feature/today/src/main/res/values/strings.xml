@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="today_title">Today</string>
+    <string name="today_add_note">Add note</string>
+    <string name="today_empty">Nothing for today. Tap \"Add note\" to write one.</string>
+    <string name="today_mark_done">Done</string>
+    <string name="today_undo_done">Undo</string>
+    <string name="today_remind_at">Reminder at %1$s</string>
+    <string name="today_note_done_state">Finished</string>
+</resources>
