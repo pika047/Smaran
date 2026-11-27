@@ -31,6 +31,7 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:security"))
     implementation(project(":core:reminders"))
+    implementation(project(":core:speech"))
     implementation(project(":feature:today"))
     implementation(project(":feature:notes"))
 

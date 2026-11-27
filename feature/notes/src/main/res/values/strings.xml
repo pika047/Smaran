@@ -21,6 +21,19 @@
     <string name="add_note_pick_time">Pick a time</string>
     <string name="add_note_error_past">That time has already passed. Please pick a later time.</string>
 
+    <string name="speak">Speak</string>
+    <string name="say_when">Say when</string>
+    <string name="listening_tap_to_stop">Listening… tap to stop</string>
+    <string name="speech_privacy_note">Your phone\'s speech service turns your voice into text. It may use the internet.</string>
+    <string name="speech_error_nothing_heard">Sorry, I didn\'t hear anything. Please try again.</string>
+    <string name="speech_error_no_permission">Smaran needs the microphone to hear you. You can allow it in the phone\'s settings.</string>
+    <string name="speech_error_not_available">Speaking isn\'t available on this phone. Please type instead.</string>
+    <string name="speech_error_needs_internet">Speaking needs an internet connection on this phone. Please type instead, or try again later.</string>
+    <string name="speech_error_busy">The microphone is busy. Please try again.</string>
+    <string name="speech_error_other">Something went wrong. Please try again.</string>
+    <string name="when_not_understood">Sorry, I didn\'t understand when. Please tap one of the buttons.</string>
+    <string name="add_note_suggested_time">%1$s (what you said)</string>
+
     <string name="dialog_ok">OK</string>
     <string name="dialog_cancel">Cancel</string>
 </resources>

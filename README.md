@@ -14,6 +14,7 @@ Status: early development. Android 8.0+ only, English first, built to add more l
 | `core:data` | Encrypted Room database (SQLCipher) and repository implementations |
 | `core:security` | Android Keystore key handling |
 | `core:reminders` | Alarms, reminder notifications, rescheduling after restart |
+| `core:speech` | Speech to text using the phone's recognizer |
 | `core:ui` | Large-text, high-contrast theme and shared components |
 | `feature:today` | Today's notes with a large Done button |
 | `feature:notes` | Adding a note and choosing when to be reminded |
