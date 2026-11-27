@@ -2,8 +2,25 @@
 <resources>
     <string name="add_note_title">New note</string>
     <string name="add_note_field_label">What do you want to remember?</string>
-    <string name="add_note_save">Save</string>
+    <string name="add_note_next">Next</string>
+    <string name="add_note_back">Back</string>
     <string name="add_note_cancel">Cancel</string>
     <string name="add_note_error_empty">Please write something first.</string>
     <string name="add_note_error_too_long">This note is too long. Please keep it under %1$d letters.</string>
+
+    <string name="add_note_when_title">When should I remind you?</string>
+    <string name="add_note_no_reminder">No reminder</string>
+    <string name="add_note_today">Today</string>
+    <string name="add_note_tomorrow">Tomorrow</string>
+    <string name="add_note_pick_date">Pick a date</string>
+
+    <string name="add_note_time_title">What time on %1$s?</string>
+    <string name="add_note_morning">Morning, %1$s</string>
+    <string name="add_note_afternoon">Afternoon, %1$s</string>
+    <string name="add_note_evening">Evening, %1$s</string>
+    <string name="add_note_pick_time">Pick a time</string>
+    <string name="add_note_error_past">That time has already passed. Please pick a later time.</string>
+
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Cancel</string>
 </resources>

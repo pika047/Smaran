@@ -27,6 +27,7 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smaran.core.model.Note
 import com.smaran.core.ui.component.BigButton
@@ -40,6 +41,10 @@ internal fun TodayRoute(
     viewModel: TodayViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    LifecycleResumeEffect(Unit) {
+        viewModel.refreshPermissions()
+        onPauseOrDispose { }
+    }
     TodayScreen(state = state, onAddNote = onAddNote, onDoneChange = viewModel::setDone)
 }
 
@@ -72,6 +77,11 @@ internal fun TodayScreen(
             Text(stringResource(R.string.today_title), style = MaterialTheme.typography.headlineLarge)
             Text(dateText, style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(Dimens.ItemSpacing))
+
+            state.warning?.let { warning ->
+                ReminderWarningBanner(warning)
+                Spacer(Modifier.height(Dimens.ItemSpacing))
+            }
 
             when {
                 state.isLoading -> Unit

@@ -22,6 +22,11 @@ internal class OfflineNoteRepository @Inject constructor(
     override fun observeNotesOn(date: LocalDate): Flow<List<Note>> =
         dao.observeByDate(date).map { list -> list.map { it.toModel() } }
 
+    override suspend fun getNote(id: Long): Note? = dao.getById(id)?.toModel()
+
+    override suspend fun getOpenRemindersFrom(from: LocalDate): List<Note> =
+        dao.getOpenRemindersFrom(from).map { it.toModel() }
+
     override suspend fun add(note: NewNote): Long = dao.insert(note.toEntity())
 
     override suspend fun setDone(id: Long, done: Boolean) = dao.setDone(id, done)

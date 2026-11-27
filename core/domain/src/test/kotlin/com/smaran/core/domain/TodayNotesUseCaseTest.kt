@@ -17,9 +17,10 @@ class TodayNotesUseCaseTest {
     // 00:30 on 27 Nov in India, while UTC is still on 26 Nov.
     private val clock = Clock.fixed(Instant.parse("2026-11-26T19:00:00Z"), ZoneId.of("Asia/Kolkata"))
     private val repo = FakeNoteRepository()
-    private val addNote = AddNoteUseCase(repo, clock)
+    private val scheduler = FakeReminderScheduler()
+    private val addNote = AddNoteUseCase(repo, scheduler, clock)
     private val observeToday = ObserveTodayNotesUseCase(repo, clock)
-    private val setDone = SetNoteDoneUseCase(repo)
+    private val setDone = SetNoteDoneUseCase(repo, repo, scheduler, clock)
 
     @Test
     fun `shows only notes for today in the phone's time zone`() = runTest {

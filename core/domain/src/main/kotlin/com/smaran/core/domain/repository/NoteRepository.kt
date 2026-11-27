@@ -8,6 +8,11 @@ import java.time.LocalDate
 /** Read side of note storage. Screens that only display notes depend on this alone. */
 interface NoteReader {
     fun observeNotesOn(date: LocalDate): Flow<List<Note>>
+
+    suspend fun getNote(id: Long): Note?
+
+    /** Notes that are not done, have a reminder time, and are dated [from] or later. */
+    suspend fun getOpenRemindersFrom(from: LocalDate): List<Note>
 }
 
 /** Write side of note storage. */
