@@ -30,6 +30,7 @@ dependencies {
     implementation(project(":core:domain"))
     implementation(project(":core:data"))
     implementation(project(":core:security"))
+    implementation(project(":core:reminders"))
     implementation(project(":feature:today"))
     implementation(project(":feature:notes"))
 

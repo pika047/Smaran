@@ -7,4 +7,8 @@
     <string name="today_undo_done">Undo</string>
     <string name="today_remind_at">Reminder at %1$s</string>
     <string name="today_note_done_state">Finished</string>
+    <string name="today_notifications_off">Reminders can\'t pop up because notifications are turned off for Smaran.</string>
+    <string name="today_turn_on_notifications">Turn on notifications</string>
+    <string name="today_exact_alarms_off">Reminders may arrive a few minutes late.</string>
+    <string name="today_allow_on_time">Allow on-time reminders</string>
 </resources>

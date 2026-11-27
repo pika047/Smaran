@@ -17,6 +17,12 @@ interface NoteDao {
     )
     fun observeByDate(date: LocalDate): Flow<List<NoteEntity>>
 
+    @Query("SELECT * FROM notes WHERE id = :id")
+    suspend fun getById(id: Long): NoteEntity?
+
+    @Query("SELECT * FROM notes WHERE isDone = 0 AND remindAt IS NOT NULL AND date >= :from")
+    suspend fun getOpenRemindersFrom(from: LocalDate): List<NoteEntity>
+
     @Insert
     suspend fun insert(note: NoteEntity): Long
 

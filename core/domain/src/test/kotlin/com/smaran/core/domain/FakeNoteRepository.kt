@@ -19,6 +19,11 @@ class FakeNoteRepository : NoteReader, NoteWriter {
     override fun observeNotesOn(date: LocalDate): Flow<List<Note>> =
         notes.map { list -> list.filter { it.date == date } }
 
+    override suspend fun getNote(id: Long): Note? = notes.value.firstOrNull { it.id == id }
+
+    override suspend fun getOpenRemindersFrom(from: LocalDate): List<Note> =
+        notes.value.filter { !it.isDone && it.remindAt != null && !it.date.isBefore(from) }
+
     override suspend fun add(note: NewNote): Long {
         val id = nextId++
         notes.update {
